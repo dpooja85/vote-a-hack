@@ -1,4 +1,3 @@
-vote-a-hack
-===========
+hackmatchvoting
 
-Mobile webapp to allow realtime voting during a hackathon
+Voting application for a hackathon
