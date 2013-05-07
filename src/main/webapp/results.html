@@ -1,0 +1,180 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>hackMatch tally-A-Matic</title> 
+    <meta charset="utf-8">
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+    <script src="jquery-ui-1.9.1.custom.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="jquery.countdown.js"></script>
+    <link href="smoothness/jquery-ui-1.9.1.custom.css" rel="stylesheet" type="text/css">
+    <link href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
+    <style>
+        #start {
+            margin: 300px auto;
+            width: 1300px;
+        }
+        #timer {
+            font: bold 300px monospace;
+            margin: 300px auto;
+            width: 1000px;
+        }
+        #timer.expired {
+            color: red;
+            text-shadow:
+			    -1px -1px 0 #000,
+			    1px -1px 0 #000,
+			    -1px 1px 0 #000,
+			    1px 1px 0 #000;
+        }
+        .project {
+            margin: 20px;
+        }
+        .scoreCard {
+            float: left;
+            width: 20%;
+            text-align: center;
+            margin: 30px;
+            border: 1px solid gray;
+            
+        }
+        .scoreCard .score {
+            margin: 20px;
+            font-size: 200px;
+        }
+        .scoreCard .name {
+            font-size: 100px;
+        }
+        .project .name {
+            font-size: 100px;
+            text-align: center;
+        }
+        #winners thead tr {
+            font-size: 50px;
+        }
+        #winners tbody tr {
+            font-size: 80px;
+        }
+        #winners .sorting, #winners .sorting_desc {
+            background: none;
+        }
+    </style>
+
+<script id="score-template" type="text/template">
+<div class="project">
+    <h2 class="name ui-widget-header ui-corner-tl ui-corner-tr" style="padding:0.5em;"></div>
+    <div class="scoreCard ui-widget ui-corner-all">
+        <div class="score popularScore">?</div>
+        <div class="judgeName ui-widget-header">Popular</div>
+    </div>
+    <div class="scoreCard ui-widget ui-corner-all">
+        <div class="score adamScore">?</div>
+        <div class="judgeName ui-widget-header">Adam</div>
+    </div>
+    <div class="scoreCard ui-widget ui-corner-all">
+        <div class="score bobScore">?</div>
+        <div class="judgeName ui-widget-header">Bob</div>
+    </div>
+    <div class="scoreCard ui-widget ui-corner-all">
+        <div class="score totalScore">?</div>
+        <div class="judgeName ui-widget-header">Total</div>
+    </div>
+</div>
+</script>
+<script type="text/javascript">
+var base = '/abc', tally = [], current = 0, mode = 'timer', leaderData = [];
+
+$(function() {
+	var $current = $('#currentProject'), $timer = $('#timer'), $leaderboard = $('#leaderboard');
+    var updateTallyData = function(callback) {
+        $.getJSON(base + '/tally.json', function(data) {
+            tally = data;
+            callback();
+        });
+    };
+
+    $(document).keypress(function(event) {
+		if (event.charCode == 32 && tally !== undefined) {
+			console.log(mode);
+			if (mode === 'timer') {
+		        mode = 'current';
+		        $leaderboard.hide();
+                $timer.countdown({
+                	until: +180,
+                	format: "MS",
+                	compact: true,
+                	onExpiry: function() {
+                		$timer.addClass('expired');
+                		
+                	}
+                });
+                $('#start').hide();
+                $timer.show();
+		    } else if (mode === 'current') {
+		    	updateTallyData(function() {
+	                var project = tally[current];
+                    leaderData.push([ project.name, project.averagePopularVote, project.adamVote, project.bobVote, project.finalScore ]);
+	                mode = 'leaderboard';
+
+	                $current.html($('#score-template').text());
+	                $('.name', $current).text(project.name);
+	                $('.popularScore', $current).text(project.averagePopularVote);
+	                $('.adamScore', $current).text(project.adamVote);
+	                $('.bobScore', $current).text(project.bobVote);
+	                $('.totalScore', $current).text(project.finalScore);
+	                $timer.hide();
+	                $timer.countdown('destroy')
+                    $timer.removeClass('expired');
+	                $current.show();
+		    	});
+			} else if (mode === 'leaderboard') {
+				updateTallyData(function() {
+                    if (current + 1 < tally.length) {
+                        current++;
+                        mode = 'timer';
+                    }
+
+                    $leaderboard.html('<table cellpadding="0" cellspacing="0" border="0" class="display" id="winners"></table>');
+                    $('#winners').dataTable( {
+                        "bPaginate": false,
+                        "bLengthChange": false,
+                        "bFilter": false,
+                        "bSort": true,
+                        "bInfo": false,
+                        "bAutoWidth": false,
+                        "aaData": leaderData,
+                        "aoColumns": [
+                            { "sTitle": "Team" },
+                            { "sTitle": "Popular Vote" },
+                            { "sTitle": "Adam's Vote" },
+                            { "sTitle": "Bob's Vote" },
+                            { "sTitle": "Final Score" }
+                        ],
+                        "aaSorting": [[ 4, "desc" ]]
+                    });
+
+                    $current.hide();
+	                $leaderboard.show();
+				});
+			}
+		}
+	});
+
+    updateTallyData(function() {});
+});
+</script>
+</head> 
+<body>
+    <div id="start">
+      <img height="330" width="1300" src="https://intranet.jumptap.com/confluence/download/attachments/19008901/Jumptap_logo650_black.png"/>
+    </div>
+    <div id="timer" style="display: none;">
+        TIMER
+    </div>
+    <div id="currentProject" style="display: none;">
+    </div>
+    <div id="leaderboard" style="display: none;">
+        LEADERBOARD
+    </div>
+</body>
+</html>

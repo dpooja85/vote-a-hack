@@ -1,1 +1,3 @@
-create table DemoObject (id int(11) NOT NULL AUTO_INCREMENT,name varchar(20), PRIMARY KEY (id));
+create table Project (id bigint not null auto_increment, name varchar(255),description varchar(140), PRIMARY KEY(id));
+create table Vote (id bigint not null auto_increment, value bigint not null,projectId bigint not null, username varchar(255) not null,PRIMARY KEY(id), UNIQUE (projectId,username)););
+create table DemoObject (id bigint not null auto_increment, stringField varchar(255), integerField int, PRIMARY KEY(id));
