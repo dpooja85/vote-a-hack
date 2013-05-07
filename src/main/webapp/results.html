@@ -82,12 +82,12 @@
 </div>
 </script>
 <script type="text/javascript">
-var base = '/abc', tally = [], current = 0, mode = 'timer', leaderData = [];
+var base = '', tally = [], current = 0, mode = 'timer', leaderData = [];
 
 $(function() {
 	var $current = $('#currentProject'), $timer = $('#timer'), $leaderboard = $('#leaderboard');
     var updateTallyData = function(callback) {
-        $.getJSON(base + '/tally.json', function(data) {
+        $.getJSON(base + '/tally', function(data) {
             tally = data;
             callback();
         });
