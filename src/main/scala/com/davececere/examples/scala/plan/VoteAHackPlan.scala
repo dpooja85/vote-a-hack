@@ -18,7 +18,7 @@ case class Project(val id:Long,val name:String,val description:String) extends K
 case class Vote(val id:Long,val value:Long,val projectId:Long,val username:String) extends KeyedEntity[Long]
 case class Tally(val name:String, val averagePopularVote:Float, val adamVote:Float,val bobVote:Float,val finalScore:Float)
 
-//A Plan that has a dependency on DemoObjectService
+//A Plan that has a dependency on ObjectService
 class VoteAHackPlan(service:ObjectService) extends Plan {
   val logger = Logger(classOf[VoteAHackPlan])
   //used implicitly when translating our objects to json

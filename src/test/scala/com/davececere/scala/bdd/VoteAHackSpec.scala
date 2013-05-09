@@ -46,8 +46,8 @@ object VoteAHackPlanSpec extends Specification
     }
   }
   
-  "demo object rest api" should {
-    "create single demoObject" in {
+  "rest api" should {
+    "create single vote" in {
       val newObj:Vote = Vote(0L,5L,1,"testuser")
       http x (((host / "vote") << Serialization.write(newObj))as_str) {
         case (code, _, Some(json), _) => {
