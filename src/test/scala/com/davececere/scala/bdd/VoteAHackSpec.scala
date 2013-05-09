@@ -8,9 +8,9 @@ import java.io.InputStreamReader
 import org.apache.http.client.methods.HttpPost
 import unfiltered.request.QParams.Fail
 import com.davececere.examples.scala.plan.AssembledPlan
-import com.davececere.examples.scala.plan.Project
-import com.davececere.examples.scala.plan.Vote
-import com.davececere.examples.scala.plan.Tally
+import com.davececere.examples.scala.service.Project
+import com.davececere.examples.scala.service.Vote
+import com.davececere.examples.scala.service.Tally
 
 //<< = post
 //<<< = put
