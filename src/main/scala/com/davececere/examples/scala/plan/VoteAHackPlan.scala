@@ -6,8 +6,6 @@ import org.clapper.avsl.Logger
 import unfiltered.request._
 import unfiltered.response._
 import net.liftweb.json._
-import org.squeryl.Schema
-import org.squeryl.KeyedEntity
 import com.davececere.examples.scala.service.DatabaseService
 import com.davececere.examples.scala.service.ObjectService
 import com.davececere.examples.scala.service.Project

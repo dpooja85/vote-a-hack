@@ -20,9 +20,7 @@ trait ObjectService {
   def createVote(vote:Vote): Vote
 }
 
-
 object DatabaseService extends Schema with ObjectService {
-
 
 	//runs just during initialization of instance. Typical squeryl initialization code
 	Class.forName("com.mysql.jdbc.Driver");
@@ -70,7 +68,6 @@ object DatabaseService extends Schema with ObjectService {
     def defaultVoteUsername(u:String):String = if (u == null) "" else u
     
     def buildTally(project:Project,votes:List[Vote]):Tally = {
-      
 	  val publicVotes = votes.filter(v => v.username != "bob" && v.username != "adam")
 	  val adamVotes = votes.filter(v => v.username=="adam")
 	  val adamVoteScore = if (adamVotes.isEmpty) 0 else adamVotes(0).value
@@ -79,7 +76,6 @@ object DatabaseService extends Schema with ObjectService {
 	  val averagePopularVote = if(publicVotes.isEmpty) 0 else publicVotes.foldLeft(0L)((a,b) => a + b.value) / publicVotes.length
 	  val finalScore = averagePopularVote + adamVoteScore + bobVoteScore
 
-	  new Tally(project.name,averagePopularVote,adamVoteScore,bobVoteScore,finalScore)
-      
+	  Tally(project.name,averagePopularVote,adamVoteScore,bobVoteScore,finalScore)
 	}
 }
