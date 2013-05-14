@@ -37,7 +37,7 @@
 </div>
 </script>
 <script type="text/javascript">
-var projectList = [], base = '/abc';
+var projectList = [], base = '';
 
 var user = $.cookie('user');
 if (user === null || user === undefined) {
@@ -74,7 +74,7 @@ $(document).bind( "pagebeforechange", function(e, data) {
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify({ projectId: project.id, value: parseInt($score.val()), username: user }),
+        data: JSON.stringify({id:0, projectId: project.id, value: parseInt($score.val()), username: user }),
         success: showNextProject
       });
     });
@@ -105,7 +105,7 @@ var gotProjectList = function(data) {
 
 $(function() {
   
-  $.getJSON(base + '/project.json', gotProjectList);
+  $.getJSON(base + '/project', gotProjectList);
 });
 </script>
 </head> 
