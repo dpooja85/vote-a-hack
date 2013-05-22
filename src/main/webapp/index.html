@@ -1,0 +1,132 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>hackMatch Vote-A-Matic</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+	<style>
+		.ui-collapsible .title {
+			width: 75%;
+			overflow: hidden;
+		}
+	</style>
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+    <script src="jquery.cookie.js"></script>
+	<script src="Math.uuid.js"></script>
+	<script src="purl.js"></script>
+<script id="project-template" type="text/regex-template">
+    <div data-role="collapsible">
+        <h3>
+			<div style="width: 2em; float: right; text-align: center;" class="score-indicator ui-btn-up-c ui-corner-all">?</div>
+			<div class="title"></div>
+		</h3>
+        <p>
+			<div class="description"></div>
+			<inpu type="hidden" class="projectId"/>
+			<input type="range" class="score" min="1" max="10" value="5"/>
+		</p>
+    </div>
+</script>
+<script type="text/javascript">
+var base = '',
+    user = $.cookie('user') || $.url().param('u'),
+    $expanded,
+    idleSave;
+
+if (user === null || user === undefined) {
+	user = Math.uuid(17);
+	$.cookie('user', user, { expires: 7 });
+}
+
+var gotProjectList = function(data) {
+    if (data.length == 0) {
+      setTimeout(function() {
+        $.getJSON(base + '/project', gotProjectList);
+      }, 1000);
+    } else {
+    	$.each(data, function(index, item) {
+			var $project = $($('#project-template').text()).appendTo($('#projectList')),
+				$name = $('.title', $project),
+				$description = $('.description', $project),
+				$score = $('.score', $project),
+				$pid = $('.projectId', $project);
+
+			$name.text(item.name);
+		    $description.text(item.description);
+		    $score.attr('id', 'slider-' + item.id);
+		    $score.attr('name', 'slider-' + item.id);
+		    $pid.val(item.id);
+    	});
+
+		$.mobile.changePage($('#voting'), { changeHash: false });
+    }
+}
+
+var saveVote = function() {
+	if ($expanded !== undefined) {
+		$.ajax({
+			url: base + '/vote',
+			type: 'POST',
+			dataType: 'json',
+			contentType: 'application/json; charset=utf-8',
+			data: JSON.stringify({id:0, projectId: parseInt($('.projectId', $expanded).val()), value: parseInt($('.score', $expanded).val()), username: user }),
+		});
+		$('.score-indicator', $expanded).text($('.score', $expanded).val());
+	}
+};
+
+$(document).bind('pagechange', function(event, context) {
+	if ('voting' === context.toPage.attr('id')) {
+		$('#projectList').bind('expand', function(event) {
+	    	if ($expanded !== undefined) {
+	    		clearTimeout(idleSave);
+	    		saveVote();
+	    	}
+	    	$expanded = $(event.target);
+	    	idleSave = setTimeout(saveVote, 5000);
+	    	$('.score', $expanded).bind('change', function() {
+	    		clearTimeout(idleSave);
+		    	idleSave = setTimeout(saveVote, 5000);
+	    	});
+	    });
+	}
+});
+
+$(function() {
+	$.getJSON(base + '/project', gotProjectList);
+});
+</script>
+</head> 
+<body>
+
+<div data-role="page" id="initial">
+	<div data-role="header" data-position="fixed">
+		<h1>hackMatch Vote</h1>
+	</div>
+
+	<div data-role="content">	
+		<p>The polls haven't opened yet.</p>		
+		<p>But I applaud your gumption.</p>	
+	</div>
+
+	<div data-role="footer" data-position="fixed">
+    <img src="http://www.jumptap.com/wp-content/themes/jtws3/styles/images/logo.png" style="display:block;margin:6px auto;"/>
+	</div>
+</div>
+
+<div data-role="page" id="voting">
+	<div data-role="header" data-position="fixed">
+		<h1>hackMatch Vote</h1>
+	</div>
+	<div data-role="content">
+		<div id="projectList" data-role="collapsible-set" data-theme="c" data-content-theme="d"></div>
+	</div>
+	<div data-role="footer" data-position="fixed">
+	    <img src="http://www.jumptap.com/wp-content/themes/jtws3/styles/images/logo.png" style="display:block;margin:6px auto;"/>
+	</div>
+</div>
+
+</body>
+</html>
