@@ -12,7 +12,7 @@ import org.squeryl.KeyedEntity
 //domain objects
 case class Project(val id:Long,val name:String,val description:String) extends KeyedEntity[Long]
 case class Vote(val id:Long,val value:Long,val projectId:Long,val username:String) extends KeyedEntity[Long]
-case class Tally(val name:String, val averagePopularVote:Float, val adamVote:Float,val bobVote:Float,val finalScore:Float)
+case class Tally(val name:String, val averagePopularVote:Float, val alexVote:Float,val markVote:Float,val joreyVote:Float,val finalScore:Float)
 
 trait ObjectService {
   def findAllProjects: List[Project]
@@ -68,14 +68,18 @@ object DatabaseService extends Schema with ObjectService {
     def defaultVoteUsername(u:String):String = if (u == null) "" else u
     
     def buildTally(project:Project,votes:List[Vote]):Tally = {
-	  val publicVotes = votes.filter(v => v.username != "bob" && v.username != "adam")
-	  val adamVotes = votes.filter(v => v.username=="adam")
-	  val adamVoteScore = if (adamVotes.isEmpty) 0 else adamVotes(0).value
-	  val bobVotes = votes.filter(v => v.username =="bob")
-	  val bobVoteScore = if (bobVotes.isEmpty) 0 else bobVotes(0).value
-	  val averagePopularVote = if(publicVotes.isEmpty) 0 else publicVotes.foldLeft(0L)((a,b) => a + b.value) / publicVotes.length
-	  val finalScore = averagePopularVote + adamVoteScore + bobVoteScore
+	  val publicVotes = votes.filter(v => v.username != "alex" && v.username != "mark" && v.username != "jorey")
+	  val alexVotes = votes.filter(v => v.username=="alex")
+	  val alexVoteScore = if (alexVotes.isEmpty) 0f else alexVotes(0).value.floatValue
+	  val markVotes = votes.filter(v => v.username =="mark")
+	  val markVoteScore = if (markVotes.isEmpty) 0f else markVotes(0).value.floatValue
+	  val joreyVotes = votes.filter(v => v.username =="jorey")
+	  val joreyVoteScore = if (joreyVotes.isEmpty) 0f else joreyVotes(0).value.floatValue
 
-	  Tally(project.name,averagePopularVote,adamVoteScore,bobVoteScore,finalScore)
+	  val averagePopularVote = if(publicVotes.isEmpty) 0f else publicVotes.foldLeft(0f)((a,b) => a + b.value.floatValue) / publicVotes.length.floatValue
+	  val averageJudgeVote = (alexVoteScore + markVoteScore + joreyVoteScore) / 3f
+	  val finalScore = (averagePopularVote * 2f + averageJudgeVote) / 3f
+
+	  Tally(project.name,averagePopularVote,alexVoteScore,markVoteScore,joreyVoteScore,finalScore)
 	}
 }

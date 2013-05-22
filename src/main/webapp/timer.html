@@ -1,0 +1,54 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+	<title>hackMatch tally-A-Matic</title> 
+    <meta charset="utf-8">
+	<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+    <script src="jquery-ui-1.9.1.custom.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js"></script>
+    <script type="text/javascript" src="jquery.countdown.js"></script>
+    <link href="smoothness/jquery-ui-1.9.1.custom.css" rel="stylesheet" type="text/css">
+    <link href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
+    <style>
+        #timer {
+            font: bold 300px monospace;
+            margin: 300px auto;
+            width: 1000px;
+        }
+        #timer.expired {
+            color: red;
+            text-shadow:
+			    -1px -1px 0 #000,
+			    1px -1px 0 #000,
+			    -1px 1px 0 #000,
+			    1px 1px 0 #000;
+        }
+    </style>
+
+<script type="text/javascript">
+$(function() {
+	var $timer = $('#timer');
+
+	$(document).keypress(function(event) {
+		if (event.charCode == 32) {
+			$timer.countdown('destroy');
+            $timer.countdown({
+            	until: +210,
+            	format: "MS",
+            	compact: true,
+            	onExpiry: function() {
+            		$timer.addClass('expired');
+            	}
+            });
+            $timer.show();
+		}
+	});
+});
+</script>
+</head> 
+<body>
+    <div id="timer" style="display: none;">
+        TIMER
+    </div>
+</body>
+</html>
