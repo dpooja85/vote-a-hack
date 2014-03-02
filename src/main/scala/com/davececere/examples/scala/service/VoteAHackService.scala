@@ -10,7 +10,7 @@ import org.squeryl.KeyedEntity
 	
 
 //domain objects
-case class Project(val id:Long,val name:String,val description:String) extends KeyedEntity[Long]
+case class Project(val id:Long,val name:String,val description:String) extends KeyedEntity[Long] 
 case class Vote(val id:Long,val value:Long,val projectId:Long,val username:String) extends KeyedEntity[Long]
 case class Tally(val name:String, val averagePopularVote:Float, val alexVote:Float,val markVote:Float,val joreyVote:Float,val finalScore:Float)
 
@@ -44,7 +44,7 @@ object DatabaseService extends Schema with ObjectService {
       inTransaction {
     	for {
     	  project <- findAllProjects
-    	} yield buildTally(project,votes.where(v => v.projectId === project.id).elements.toList)
+    	} yield buildTally(project,votes.where(v => v.projectId === project.id).toList)
       }
 	}
 	  
